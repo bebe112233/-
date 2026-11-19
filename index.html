@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>化学 一問一答</title>
+<style>
+:root{--bg:#f4f5f7;--fg:#1c1c1e;--sub:#6b6b70;--card:#fff;--line:#d9d9de;--ok:#1f9d55;--ng:#d93a3a;--ac:#2f6fed;--glass:#9a9aa2;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111214;--fg:#f2f2f4;--sub:#9a9aa2;--card:#1e1f23;--line:#33353b;--ok:#4cc982;--ng:#ff6b6b;--ac:#6b9bff;--glass:#7c7c86}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif}
+#app{max-width:560px;margin:0 auto;padding:16px}
+h1{font-size:26px;text-align:center;margin:24px 0 6px}
+.sub{color:var(--sub);text-align:center;font-size:14px}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:16px 0}
+.seg button{flex:1;padding:10px;border:0;background:none;color:var(--fg);font-size:15px}
+.seg button.on{background:var(--ac);color:#fff}
+.menu button{display:flex;justify-content:space-between;align-items:center;width:100%;padding:16px;margin-bottom:10px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--fg);font-size:17px;font-weight:600}
+.menu button.hi{border-color:var(--ac)}
+.menu small{color:var(--sub);font-weight:400;font-size:12px}
+.top{display:flex;justify-content:space-between;align-items:center;color:var(--sub);font-size:14px}
+.link{border:0;background:none;color:var(--ac);font-size:15px;padding:6px 0}
+.q{font-size:19px;font-weight:700;text-align:center;margin:18px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ch{min-height:68px;padding:10px;border:2px solid transparent;border-radius:12px;background:var(--card);color:var(--fg);font-size:15px;text-align:left;display:flex;align-items:center;gap:6px}
+.ch.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 18%,var(--card))}
+.ch.ng{border-color:var(--ng);background:color-mix(in srgb,var(--ng) 18%,var(--card))}
+.ch.dim{opacity:.55}
+.sw{display:flex;justify-content:center;align-items:center;gap:8px;margin:14px 0 6px;flex-wrap:wrap}
+.note{text-align:center;color:var(--sub);font-size:14px;margin:6px 0 10px}
+.main{display:block;width:100%;padding:14px;border:0;border-radius:12px;background:var(--ac);color:#fff;font-size:17px;font-weight:700;margin-top:10px}
+.sec{background:var(--card);color:var(--fg);border:1px solid var(--line)}
+.score{font-size:22px;text-align:center;margin:8px 0 14px}
+.rec{display:flex;gap:10px;background:var(--card);border-radius:12px;padding:12px;margin-bottom:10px;align-items:flex-start}
+.rec .t{flex:1;font-size:14px}.rec b{font-size:15px}
+.rec .sws{display:flex;gap:2px;flex-wrap:wrap;justify-content:flex-end;max-width:110px}
+.g{color:var(--ok)}.r{color:var(--ng)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const C={bl:"#2666D9",pg:"#BFE6BF",yb:"#CC9933",gr:"#339947",pk:"#F7BFCC",rp:"#991A73",ye:"#FAD91A",ro:"#E66619",dg:"#1A5933",db:"#0D26A6",wh:"#F7F7F7",py:"#FFF7B3",rb:"#A6401A",br:"#734726",bk:"#141414",rd:"#D91A1A",yg:"#A6D926",bw:"#BFD9F7",gw:"#D9F2D9",bp:"#4D33B3",bg:"#1AA699",or:"#F27333",cr:"#BF0D33",kp:"#331447",bd:"#B30D1A",cl:"#EBEBEB"};
+const CATS=["水溶液の色","沈殿の色","物質の色","炎色反応","反応・現象","法則・定義","水への溶解","酸化剤・還元剤"];
+// [カテゴリ, 問題, 答え, [色], 補足, 表示("p"=沈殿)]
+const Q=[
+[0,"Cu²⁺ の水溶液の色は?","青色",["bl"]],
+[0,"Fe²⁺ の水溶液の色は?","淡緑色",["pg"]],
+[0,"Fe³⁺ の水溶液の色は?","黄褐色",["yb"]],
+[0,"Ni²⁺ の水溶液の色は?","緑色",["gr"]],
+[0,"Co²⁺ の水溶液の色は?","淡赤色",["pk"]],
+[0,"MnO₄⁻ の水溶液の色は?","赤紫色",["rp"]],
+[0,"CrO₄²⁻ の水溶液の色は?","黄色",["ye"]],
+[0,"Cr₂O₇²⁻ の水溶液の色は?","赤橙色",["ro"]],
+[0,"Cr³⁺ の水溶液の色は?","暗緑色",["dg"]],
+[0,"[Cu(NH₃)₄]²⁺ の水溶液の色は?","深青色",["db"]],
+[0,"[Ag(NH₃)₂]⁺ の水溶液の色は?","無色",["cl"]],
+[0,"Mn²⁺ の水溶液の色は?","淡桃色",["pk"]],
+[1,"AgCl の沈殿の色は?","白色",["wh"],"アンモニア水に溶ける"],
+[1,"AgBr の沈殿の色は?","淡黄色",["py"]],
+[1,"AgI の沈殿の色は?","黄色",["ye"]],
+[1,"Ag₂CrO₄ の沈殿の色は?","赤褐色",["rb"]],
+[1,"Ag₂O の沈殿の色は?","褐色",["br"]],
+[1,"BaSO₄ の沈殿の色は?","白色",["wh"]],
+[1,"PbCl₂ の沈殿の色は?","白色",["wh"],"熱水には溶ける"],
+[1,"PbI₂ の沈殿の色は?","黄色",["ye"]],
+[1,"PbCrO₄ の沈殿の色は?","黄色",["ye"]],
+[1,"PbS の沈殿の色は?","黒色",["bk"]],
+[1,"CuS の沈殿の色は?","黒色",["bk"]],
+[1,"ZnS の沈殿の色は?","白色",["wh"]],
+[1,"CdS の沈殿の色は?","黄色",["ye"]],
+[1,"Cu(OH)₂ の沈殿の色は?","青白色",["bw"]],
+[1,"水酸化鉄(Ⅲ)の沈殿の色は?","赤褐色",["rb"]],
+[1,"Fe(OH)₂ の沈殿の色は?","緑白色",["gw"]],
+[1,"Al(OH)₃ の沈殿の色は?","白色",["wh"]],
+[1,"CaCO₃ の沈殿の色は?","白色",["wh"]],
+[2,"塩素 Cl₂ の色は?","黄緑色",["yg"]],
+[2,"フッ素 F₂ の色は?","淡黄色",["py"]],
+[2,"臭素 Br₂ の色は?","赤褐色",["rb"]],
+[2,"ヨウ素 I₂ の色は?","黒紫色",["kp"],"昇華性がある"],
+[2,"NO₂ の色は?","赤褐色",["rb"]],
+[2,"CuO の色は?","黒色",["bk"]],
+[2,"Cu₂O の色は?","赤色",["rd"]],
+[2,"MnO₂ の色は?","黒色",["bk"]],
+[2,"Fe₂O₃ の色は?","赤褐色",["rb"]],
+[2,"Fe₃O₄ の色は?","黒色",["bk"]],
+[2,"硫黄(斜方硫黄)の色は?","黄色",["ye"]],
+[2,"CuSO₄·5H₂O の色は?","青色",["bl"],"加熱して無水物にすると白色"],
+[2,"無水硫酸銅(II) CuSO₄ の色は?","白色",["wh"],"水を加えると青色に戻る"],
+[3,"Li の炎色反応の色は?","赤色",["rd"]],
+[3,"Na の炎色反応の色は?","黄色",["ye"]],
+[3,"K の炎色反応の色は?","赤紫色",["rp"]],
+[3,"Ca の炎色反応の色は?","橙赤色",["or"]],
+[3,"Sr の炎色反応の色は?","紅色",["cr"]],
+[3,"Ba の炎色反応の色は?","黄緑色",["yg"]],
+[3,"Cu の炎色反応の色は?","青緑色",["bg"]],
+[4,"石灰水に CO₂ を通すとどうなる?","白濁する",["wh"],"通し続けると Ca(HCO₃)₂ になり、溶けて透明に戻る","p"],
+[4,"Cu²⁺ にアンモニア水を少量加えると?","青白色沈殿",["bw"],"過剰に加えると [Cu(NH₃)₄]²⁺ となり深青色の溶液になる","p"],
+[4,"Zn²⁺ に NaOH 水溶液を少量加え、さらに過剰に加えると?","白色沈殿が生じ、過剰で溶けて無色になる",[],"[Zn(OH)₄]²⁻ ができる"],
+[4,"Al³⁺ に NaOH 水溶液を少量加え、さらに過剰に加えると?","白色沈殿が生じ、過剰で溶けて無色になる",[],"[Al(OH)₄]⁻ ができる"],
+[4,"Ag⁺ にアンモニア水を少量加え、さらに過剰に加えると?","褐色沈殿が生じ、過剰で溶けて無色になる",[],"[Ag(NH₃)₂]⁺ ができる"],
+[4,"Fe³⁺ に KSCN 水溶液を加えると?","血赤色",["bd"]],
+[4,"Fe³⁺ に K₄[Fe(CN)₆] を加えると?","濃青色沈殿",["db"],"","p"],
+[4,"Fe²⁺ に K₃[Fe(CN)₆] を加えると?","濃青色沈殿",["db"],"","p"],
+[4,"K₂CrO₄ 水溶液に酸を加えると?","黄色から赤橙色に変わる",["ye","ro"],"CrO₄²⁻ → Cr₂O₇²⁻"],
+[4,"K₂Cr₂O₇ 水溶液に塩基を加えると?","赤橙色から黄色に変わる",["ro","ye"],"Cr₂O₇²⁻ → CrO₄²⁻"],
+[4,"酸性の KMnO₄ 水溶液に H₂O₂ を加えると?","赤紫色が消えて無色になる",["rp","cl"]],
+[4,"銅に濃硝酸を加えると?","NO₂",["rb","bl"]],
+[4,"銅に希硝酸を加えると?","NO",["cl","rb"]],
+[4,"NH₃ と HCl の気体が触れ合うと?","白煙が生じる",["wh"]],
+[4,"ヨウ素デンプン反応の色は?","青紫色",["bp"]],
+[4,"フェーリング液にグルコースを加えて加熱すると?","赤色沈殿",["rd"],"","p"],
+[4,"塩化コバルト紙に水がつくと?","青色から桃色(淡赤色)に変わる",["bl","pk"]],
+[4,"BTB溶液の色は 酸性・中性・塩基性 でそれぞれ?","酸性:黄色 / 中性:緑色 / 塩基性:青色",["ye","gr","bl"]],
+[4,"フェノールフタレインの色は 酸性・塩基性 でそれぞれ?","酸性:無色 / 塩基性:赤色",["cl","rd"]],
+[4,"メチルオレンジの色は 酸性・塩基性 でそれぞれ?","酸性:赤色 / 塩基性:黄色",["rd","ye"]],
+[5,"化学反応の反応熱は、反応の経路によらず、最初と最後の状態だけで決まる。この法則は?","ヘスの法則",[],"総熱量保存の法則とも呼ばれる"],
+[5,"平衡状態にある系の濃度・圧力・温度などの条件を変えると、その変化を打ち消す向きに平衡が移動する。この原理は?","ルシャトリエの原理",[],"平衡移動の原理とも呼ばれる"],
+[5,"圧力が一定のとき、一定量の気体の体積は絶対温度に比例する。この法則は?","シャルルの法則",[],"V/T = 一定"],
+[5,"温度が一定のとき、一定量の気体の体積は圧力に反比例する。この法則は?","ボイルの法則",[],"PV = 一定"],
+[5,"一定量の気体の体積は、圧力に反比例し、絶対温度に比例する。この法則は?","ボイル・シャルルの法則",[],"PV/T = 一定"],
+[5,"希薄溶液の浸透圧は、溶液のモル濃度と絶対温度に比例する。この法則は?","ファントホッフの法則",[],"Π = cRT"],
+[5,"化学反応の前後で、反応に関わる物質の質量の総和は変わらない。この法則は?","質量保存の法則",[],"ラボアジエが発見"],
+[5,"同じ化合物では、成分元素の質量の比は常に一定である。この法則は?","定比例の法則",[],"プルーストが発見"],
+[5,"2種類の元素が化合して複数の化合物をつくるとき、一方の元素の一定質量と化合する他方の元素の質量は、簡単な整数比になる。この法則は?","倍数比例の法則",[],"ドルトンが発見"],
+[5,"気体の圧力・体積・物質量・絶対温度の関係を表し、気体定数 R を含む式は?","理想気体の状態方程式",[],"PV = nRT"],
+[5,"溶解度の小さい気体が一定量の溶媒に溶ける量(物質量)は、温度一定のとき、その気体の圧力(分圧)に比例する。この法則は?","ヘンリーの法則",[],"アンモニアや塩化水素のような溶解度の大きい気体には成り立たない"],
+[5,"水溶液中で H⁺ を出す物質を酸、OH⁻ を出す物質を塩基とする定義は?","アレニウスの定義",[],"水溶液中の反応に限られる"],
+[5,"H⁺ を与える物質を酸、H⁺ を受け取る物質を塩基とする定義は?","ブレンステッド・ローリーの定義",[],"水溶液以外の反応にも使える"],
+[5,"混合気体の全圧は、各成分気体の分圧の和に等しい。この法則は?","ドルトンの法則",[],"ドルトンの分圧の法則：P = P₁ + P₂ + …"],
+[5,"電子 1 mol あたりの電気量の大きさ(約 9.65×10⁴ C/mol)を表す定数は?","ファラデー定数",[],"電気分解の計算に使う"],
+[5,"理想気体の状態方程式 PV = nRT に現れる R(約 8.31 J/(mol·K))を表す定数は?","気体定数",[],"R = 8.31 J/(mol·K)"],
+[5,"物質 1 mol あたりに含まれる粒子の数(約 6.02×10²³/mol)を表す定数は?","アボガドロ定数",[],""],
+[5,"可逆反応が平衡状態にあるとき、反応物と生成物の濃度の間に成り立つ一定の値を表す定数は?","平衡定数",[],"温度が一定なら一定の値になる"],
+[5,"電子対を受け取る物質を酸、電子対を与える物質を塩基とする定義は?","ルイスの定義",[],"H⁺ が関係しない反応にも使える"],
+[5,"分子間力と分子自身の体積を補正した、実在気体の状態方程式は?","ファンデルワールスの状態方程式",[],""],
+[5,"電極電位が、酸化剤・還元剤の濃度によって変化することを表す式は?","ネルンストの式",[],""],
+...[["NaCl",1],["KCl",1],["KNO₃",1],["NaNO₃",1],["AgNO₃",1],["Na₂CO₃",1],["K₂CO₃",1],["Na₂SO₄",1],["CuSO₄",1],["MgSO₄",1],["FeSO₄",1],["ZnSO₄",1],["CaCl₂",1],["BaCl₂",1],["NH₄Cl",1],["(NH₄)₂SO₄",1],["Ba(NO₃)₂",1],["Pb(NO₃)₂",1],["NaOH",1,"強塩基"],["KOH",1,"強塩基"],["Ba(OH)₂",1,"水酸化物では例外的によく溶ける"],
+["AgCl",0,"一応、ほんのわずかに溶けます"],["AgBr",0],["AgI",0],["BaSO₄",0],["PbSO₄",0],["CaCO₃",0,"CO₂を含む水には溶ける"],["BaCO₃",0],["Cu(OH)₂",0],["水酸化鉄(Ⅲ)",0],["Fe(OH)₂",0],["Al(OH)₃",0],["Mg(OH)₂",0],["Zn(OH)₂",0],["CuS",0],["PbS",0],["ZnS",0],["FeS",0,"希塩酸には溶ける"],["CdS",0],["Ag₂CrO₄",0],["PbCrO₄",0],["BaCrO₄",0],["PbI₂",0],["Ag₂O",0],["CuO",0],["SiO₂",0]].map(([f,y,n])=>[6,f+" は水に溶ける?",y?"溶ける":"溶けない",[],n||""]),
+...[["KMnO₄","o","酸性条件では Mn²⁺ になる強い酸化剤"],["K₂Cr₂O₇","o","酸性条件では Cr³⁺ になる"],["O₃","o"],["O₂","o"],["Cl₂","o"],["F₂","o"],["Br₂","o"],["I₂","b"],["加熱した濃硫酸","o","SO₂ になる"],["濃硝酸","o","NO₂ になる"],["MnO₂","o","酸性条件では Mn²⁺ になる"],["PbO₂","o","鉛蓄電池の正極"],["Fe³⁺","o","Fe²⁺ になる"],
+["H₂","r"],["C","r"],["CO","r","CO₂ になる"],["Na","r"],["Mg","r"],["Zn","r"],["Al","r"],["Fe","r"],["FeSO₄","r","Fe²⁺ → Fe³⁺"],["SnCl₂","r","Sn²⁺ → Sn⁴⁺"],["KI","r","I⁻ → I₂"],["H₂S","r","S になる"],["シュウ酸 (COOH)₂","r","CO₂ になる。KMnO₄ の滴定に使う"],["Na₂S₂O₃","r","ヨウ素滴定に使う"],
+["H₂O₂","b","KI や Fe²⁺ に対しては酸化剤、KMnO₄ に対しては還元剤"],["SO₂","b","H₂S に対しては酸化剤、KMnO₄ や Cl₂ に対しては還元剤"],["HNO₂","b","相手によって酸化剤にも還元剤にもなる"],
+["NaOH","n","酸化数が変化しないので、はたらかない"],["KOH","n","酸化数が変化しないので、はたらかない"],["Na₂SO₄","n","S が最高の酸化数 +6 だが、水溶液中では酸化剤としてほとんどはたらかない"],["CaCO₃","n","酸化数が変化しないので、はたらかない"],["CaO","n","酸化数が変化しないので、はたらかない"]].map(([f,k,n])=>[7,f+" は酸化剤? 還元剤?",({o:"酸化剤",r:"還元剤",b:"両方(相手による)",n:"どちらでもない"})[k],[],n||""]),
+].map(([cat,q,a,cols,note,st])=>({cat,q,a,cols,note:note||"",style:st==="p"?"p":cat===1?"p":cat===3?"f":"l"}));
+
+const GROUPS=[
+["黄色","淡黄色","淡黄色(気体)","黄褐色"],
+["白色","白色(ゲル状)","青白色","緑白色","無色","ほぼ無色(淡桃色)"],
+["緑色","淡緑色","暗緑色","緑白色"],
+["黄緑色","黄緑色(気体)","青緑色","緑色"],
+["青色","深青色","青白色","青緑色","青紫色"],
+["赤褐色","赤褐色(液体)","赤褐色(気体)","褐色","黄褐色"],
+["淡赤色","淡桃色"],
+["赤色","橙赤色","赤橙色","紅色"],
+["赤紫色","青紫色","黒紫色(固体)"],
+["黒色","黒色(黒褐色)","黒紫色(固体)"],
+["ファンデルワールスの状態方程式","理想気体の状態方程式"],
+].map(g=>new Set(g));
+const conf=(a,b)=>GROUPS.some(g=>g.has(a)&&g.has(b));
+const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+// 答えの種類(定数・定義・式)が同じものをダミーに優先する
+const kind=a=>/定数/.test(a)?"k":/定義/.test(a)?"d":/(方程式|式)$/.test(a)?"e":"o";
+
+function swatch(col,style,scale){
+  const c=C[col],w=80*scale,h=90*scale;
+  const sh="M2,2 V80 Q2,88 12,88 H68 Q78,88 78,80 V2";
+  let body="";
+  if(style==="l") body=`<path d="M2,22 V80 Q2,88 12,88 H68 Q78,88 78,80 V22Z" fill="${c}"/><path d="${sh}" fill="none" stroke="var(--glass)" stroke-width="2"/>`;
+  else if(style==="p") body=`<path d="M2,22 V80 Q2,88 12,88 H68 Q78,88 78,80 V22Z" fill="#4a90e2" fill-opacity=".14"/><ellipse cx="40" cy="81" rx="28" ry="8" fill="${c}" stroke="var(--glass)" stroke-opacity=".6"/><path d="${sh}" fill="none" stroke="var(--glass)" stroke-width="2"/>`;
+  else body=`<rect width="80" height="90" rx="10" fill="#1d1d22"/><path transform="translate(17,10)" d="M23,0 C29,19 46,34 46,53 Q23,80 0,53 C0,34 17,19 23,0Z" fill="${c}"/><path transform="translate(30.5,48)" d="M9.5,0 C15.5,9 19,16 19,25 Q9.5,38 0,25 C0,16 3.5,9 9.5,0Z" fill="#fff" fill-opacity=".55"/>`;
+  return `<svg width="${w}" height="${h}" viewBox="0 0 80 90">${body}</svg>`;
+}
+const swatches=(q,s)=>q.cols.map((c,i)=>(i?`<span style="color:var(--sub)">→</span>`:"")+swatch(c,q.style,s)).join("");
+
+const S={phase:"menu",count:10,cat:null,deck:[],i:0,choices:[],sel:null,rec:[]};
+const $=document.getElementById("app");
+
+function makeChoices(){
+  const q=S.deck[S.i];if(!q){S.choices=[];return}
+  if(q.cat===6){S.choices=["溶ける","溶けない"];return}
+  if(q.cat===7){S.choices=["酸化剤","還元剤","両方(相手による)","どちらでもない"];return}
+  const picked=[];
+  const same=shuf(Q.filter(x=>x.cat===q.cat)),oth=shuf(Q.filter(x=>x.cat!==q.cat&&x.cat!==6&&x.cat!==7));
+  const list=[...same,...oth].sort((x,y)=>(kind(y.a)===kind(q.a))-(kind(x.a)===kind(q.a)));
+  for(const it of list){
+    const a=it.a;
+    if(a===q.a||picked.includes(a)||conf(a,q.a)||picked.some(p=>conf(p,a)))continue;
+    picked.push(a);if(picked.length===3)break;
+  }
+  S.choices=shuf([...picked,q.a]);
+}
+function begin(list){S.deck=list;S.i=0;S.sel=null;S.rec=[];S.phase="quiz";makeChoices();render()}
+function start(cat){
+  S.cat=cat;
+  const pool=shuf(cat===null?Q:Q.filter(q=>q.cat===cat));
+  begin(S.count?pool.slice(0,S.count):pool);
+}
+const wrongList=()=>S.rec.filter(r=>r.chosen!==r.q.a).map(r=>r.q);
+function pick(c){if(S.sel!==null)return;S.sel=c;S.rec.push({q:S.deck[S.i],chosen:c});render()}
+function next(){S.i++;S.sel=null;if(S.i>=S.deck.length){S.phase="result"}else makeChoices();render();window.scrollTo(0,0)}
+function menu(){S.phase="menu";render()}
+
+function render(){
+  if(S.phase==="menu"){
+    $.innerHTML=`<h1>化学 一問一答</h1><div class="sub">出題数を選んでから、種類を選んでください</div>
+    <div class="seg">${[[10,"10問"],[20,"20問"],[0,"全部"]].map(([n,l])=>`<button class="${S.count===n?"on":""}" data-n="${n}">${l}</button>`).join("")}</div>
+    <div class="menu"><button class="hi" data-c="all">全部(ランダム)<small>全${Q.length}問</small></button>
+    ${CATS.map((n,i)=>`<button data-c="${i}">${n}<small>全${Q.filter(q=>q.cat===i).length}問</small></button>`).join("")}</div>`;
+    $.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{S.count=+b.dataset.n;render()});
+    $.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>start(b.dataset.c==="all"?null:+b.dataset.c));
+  }else if(S.phase==="quiz"){
+    const q=S.deck[S.i],done=S.sel!==null,last=S.i+1>=S.deck.length;
+    $.innerHTML=`<div class="top"><button class="link" id="quit">やめる</button><span>${S.i+1} / ${S.deck.length}</span></div>
+    <div class="q">${q.q}</div>
+    <div class="grid">${S.choices.map((c,i)=>{
+      let k="ch";if(done){if(c===q.a)k+=" ok";else if(c===S.sel)k+=" ng";else k+=" dim"}
+      return `<button class="${k}" data-i="${i}" ${done?"disabled":""}>${c}${done&&c===q.a?" ✓":""}${done&&c===S.sel&&c!==q.a?" ✗":""}</button>`}).join("")}</div>
+    ${done?`<div class="sw">${swatches(q,1)}</div>${q.note?`<div class="note">${q.note}</div>`:""}<button class="main" id="nx">${last?"結果を見る":"次へ"}</button>`:""}`;
+    $.querySelector("#quit").onclick=menu;
+    $.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>pick(S.choices[+b.dataset.i]));
+    if(done)$.querySelector("#nx").onclick=next;
+  }else{
+    const ok=S.rec.filter(r=>r.chosen===r.q.a).length,w=wrongList();
+    $.innerHTML=`<h1>結果</h1><div class="score">正解 ${ok} / ${S.rec.length}</div>
+    ${S.rec.map((r,i)=>{const good=r.chosen===r.q.a;return `<div class="rec"><div class="t"><b>${i+1}. ${r.q.q}</b><br>
+      ${good?`<span class="g">○ 正解:${r.q.a}</span>`:`<span class="r">× あなたの答え:${r.chosen}</span><br><span class="g">正解:${r.q.a}</span>`}
+      ${r.q.note?`<br><small style="color:var(--sub)">${r.q.note}</small>`:""}</div><div class="sws">${swatches(r.q,.5)}</div></div>`}).join("")}
+    ${w.length?`<button class="main" id="rv">間違えた ${w.length} 問を復習</button>`:""}
+    <button class="main sec" id="rs">もう一度</button><button class="main sec" id="bk">ホームに戻る</button>`;
+    if(w.length)$.querySelector("#rv").onclick=()=>begin(shuf(w));
+    $.querySelector("#rs").onclick=()=>start(S.cat);
+    $.querySelector("#bk").onclick=menu;
+    window.scrollTo(0,0);
+  }
+}
+render();
+</script>
+</body>
+</html>
